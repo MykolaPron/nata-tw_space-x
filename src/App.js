@@ -14,9 +14,20 @@ const App = () => {
         })
     }, [])
 
+    const handleAddMore = () => {
+        const newPage = page + 1
+        getLaunchesByPage(newPage).then((response)=>{
+            setLaunches((prevState) => {
+                return [...prevState, ...response.data.docs]
+            })
+            setPage(newPage)
+        })
+    }
+
     return (
         <div>
             <LaunchList launches={launches}/>
+            <button onClick={handleAddMore}>Load more (Pages: {totalPages - page})</button>
         </div>
     );
 };
