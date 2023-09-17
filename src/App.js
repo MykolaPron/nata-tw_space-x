@@ -7,8 +7,12 @@ const App = () => {
     const [page, setPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
 
+    const [filterNameValue, setFilterNameValue] = useState("")
+    const [filterFlightNumberValue, setFilterFlightNumberValue] = useState("")
+    const [filterDateValue, setFilterDateValue] = useState("")
+
     useEffect(() => {
-        getLaunchesByPage().then((response)=>{
+        getLaunchesByPage().then((response) => {
             setLaunches(response.data.docs)
             setTotalPages(response.data.totalPages)
         })
@@ -16,7 +20,7 @@ const App = () => {
 
     const handleAddMore = () => {
         const newPage = page + 1
-        getLaunchesByPage(newPage).then((response)=>{
+        getLaunchesByPage(newPage).then((response) => {
             setLaunches((prevState) => {
                 return [...prevState, ...response.data.docs]
             })
@@ -24,9 +28,70 @@ const App = () => {
         })
     }
 
+    const handleFilterNameChange = (event) => {
+        const value = event.target.value
+        setFilterNameValue(value)
+    }
+
+    const handleFilterFlightNumberChange = (event) => {
+        const value = event.target.value
+        setFilterFlightNumberValue(value)
+    }
+    const handleFilterDateChange = (event) => {
+        const value = event.target.value
+        setFilterDateValue(value)
+    }
+
+    const getLaunchesFilteredByName = (launches) => {
+        return launches.filter((launch) => {
+            return launch.name.toLowerCase().includes(filterNameValue.toLowerCase())
+        })
+    }
+
+    const launchesFilteredByName = getLaunchesFilteredByName(launches)
+
     return (
         <div>
-            <LaunchList launches={launches}/>
+            <div>
+                <h2>Filters</h2>
+                <div>
+                    <label htmlFor="filter-name">
+                        Name
+                        <input
+                            type="text"
+                            name="filter-name"
+                            id="filter-name"
+                            value={filterNameValue}
+                            onChange={handleFilterNameChange}
+                        />
+                    </label>
+                </div>
+                <div>
+                    <label htmlFor="filter-flight_number">
+                        Flight Number
+                        <input
+                            type="text"
+                            name="filter-flight_number"
+                            id="filter-flight_number"
+                            value={filterFlightNumberValue}
+                            onChange={handleFilterFlightNumberChange}
+                        />
+                    </label>
+                </div>
+                <div>
+                    <label htmlFor="filter-date">
+                        Date
+                        <input
+                            type="text"
+                            name="filter-date"
+                            id="filter-date"
+                            value={filterDateValue}
+                            onChange={handleFilterDateChange}
+                        />
+                    </label>
+                </div>
+            </div>
+            <LaunchList launches={launchesFilteredByName}/>
             <button onClick={handleAddMore}>Load more (Pages: {totalPages - page})</button>
         </div>
     );
