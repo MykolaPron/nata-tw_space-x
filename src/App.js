@@ -24,6 +24,11 @@ const App = () => {
 
     const handleAddMore = () => {
         const newPage = page + 1
+
+        if (newPage > totalPages) {
+            return;
+        }
+
         getLaunchesByPage(newPage).then((response) => {
             dispatch(addLaunches(response.data.docs))
             dispatch(setPage(newPage))
@@ -50,7 +55,7 @@ const App = () => {
         })
     }
     const getLaunchesFilteredByFlightNumber = (launches) => {
-        if(filterFlightNumberValue === ""){
+        if (filterFlightNumberValue === "") {
             return launches
         }
 
