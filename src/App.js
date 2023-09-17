@@ -16,17 +16,18 @@ const App = () => {
     const [filterNameValue, setFilterNameValue] = useState("")
     const [filterFlightNumberValue, setFilterFlightNumberValue] = useState("")
     const [filterDateValue, setFilterDateValue] = useState("")
-    const [canObserv, setCanObserv] = useState(false)
+    const [canObserve, setCanObserve] = useState(false)
 
     useEffect(() => {
         getLaunchesByPage().then((response) => {
             dispatch(addLaunches(response.data.docs))
             dispatch(setTotalPages(response.data.totalPages))
-            setCanObserv(true)
+            setCanObserve(true)
         })
     }, [])
 
     const handleAddMore = () => {
+        setCanObserve(false)
         const newPage = page + 1
 
         if (newPage > totalPages) {
@@ -36,6 +37,7 @@ const App = () => {
         getLaunchesByPage(newPage).then((response) => {
             dispatch(addLaunches(response.data.docs))
             dispatch(setPage(newPage))
+            setCanObserve(true)
         })
     }
 
@@ -83,17 +85,19 @@ const App = () => {
 
 
     useEffect(() => {
-        if(!canObserv){
+        if(!canObserve){
             return
         }
-
         const observer = new IntersectionObserver(
             entries => {
                 if (entries[0].isIntersecting) {
                     handleAddMore()
                 }
             },
-            { threshold: 1 }
+            {
+                rootMargin: '0px',
+                threshold: [ 0, 0.5 ]
+            }
         );
 
         if (observerTarget.current) {
@@ -105,8 +109,7 @@ const App = () => {
                 observer.unobserve(observerTarget.current);
             }
         };
-    }, [observerTarget, canObserv, page, totalPages]);
-
+    }, [observerTarget, page, totalPages, canObserve]);
 
     return (
         <div>
@@ -151,7 +154,9 @@ const App = () => {
             </div>
             <LaunchList launches={launchesFilteredByDate}/>
             <button onClick={handleAddMore}>Load more (Pages: {totalPages - page})</button>
-            <div ref={observerTarget}></div>
+            <div ref={observerTarget} style={{
+                height: "10px"
+            }}></div>
         </div>
     );
 };
