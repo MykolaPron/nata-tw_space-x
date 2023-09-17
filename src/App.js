@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import LaunchList from "./components/LaunchList";
 import {getLaunchesByPage} from "./services/launchesService";
 import {useDispatch, useSelector} from "react-redux";
