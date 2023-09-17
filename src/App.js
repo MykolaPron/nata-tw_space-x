@@ -57,8 +57,18 @@ const App = () => {
         })
     }
 
+
+    const getLaunchesFilteredDate = (launches) => {
+        return launches.filter((launch) => {
+            const date = new Date(launch.date_unix)
+
+            return date.toLocaleDateString().includes(filterDateValue)
+        })
+    }
+
     const launchesFilteredByName = getLaunchesFilteredByName(launches)
     const launchesFilteredByFlightNumber = getLaunchesFilteredByFlightNumber(launchesFilteredByName)
+    const launchesFilteredByDate = getLaunchesFilteredDate(launchesFilteredByFlightNumber)
 
     return (
         <div>
@@ -101,7 +111,7 @@ const App = () => {
                     </label>
                 </div>
             </div>
-            <LaunchList launches={launchesFilteredByFlightNumber}/>
+            <LaunchList launches={launchesFilteredByDate}/>
             <button onClick={handleAddMore}>Load more (Pages: {totalPages - page})</button>
         </div>
     );
