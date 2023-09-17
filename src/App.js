@@ -1,12 +1,19 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import LaunchList from "./components/LaunchList";
+import {getLaunchesByPage} from "./services/launchesService";
 
 const App = () => {
-    const launches = [
-        {id: 1, name: "Test 1"},
-        {id: 2, name: "Test 2"},
-        {id: 3, name: "Test 3"}
-    ];
+    const [launches, setLaunches] = useState([])
+    const [page, setPage] = useState(1)
+    const [totalPages, setTotalPages] = useState(1)
+
+    useEffect(() => {
+        getLaunchesByPage().then((response)=>{
+            setLaunches(response.data.docs)
+            setTotalPages(response.data.totalPages)
+        })
+    }, [])
+
     return (
         <div>
             <LaunchList launches={launches}/>
