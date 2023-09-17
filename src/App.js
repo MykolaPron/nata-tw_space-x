@@ -1,11 +1,15 @@
 import React, {useEffect, useState} from 'react';
 import LaunchList from "./components/LaunchList";
 import {getLaunchesByPage} from "./services/launchesService";
+import {useDispatch, useSelector} from "react-redux";
+import {addLaunches, setPage, setTotalPages} from "./redux/reducers/launchSlice";
 
 const App = () => {
-    const [launches, setLaunches] = useState([])
-    const [page, setPage] = useState(1)
-    const [totalPages, setTotalPages] = useState(1)
+    const launches = useSelector((state) => state.launch.launches)
+    const page = useSelector((state) => state.launch.page)
+    const totalPages = useSelector((state) => state.launch.totalPages)
+
+    const dispatch = useDispatch()
 
     const [filterNameValue, setFilterNameValue] = useState("")
     const [filterFlightNumberValue, setFilterFlightNumberValue] = useState("")
@@ -13,18 +17,16 @@ const App = () => {
 
     useEffect(() => {
         getLaunchesByPage().then((response) => {
-            setLaunches(response.data.docs)
-            setTotalPages(response.data.totalPages)
+            dispatch(addLaunches(response.data.docs))
+            dispatch(setTotalPages(response.data.totalPages))
         })
     }, [])
 
     const handleAddMore = () => {
         const newPage = page + 1
         getLaunchesByPage(newPage).then((response) => {
-            setLaunches((prevState) => {
-                return [...prevState, ...response.data.docs]
-            })
-            setPage(newPage)
+            dispatch(addLaunches(response.data.docs))
+            dispatch(setPage(newPage))
         })
     }
 
