@@ -9,6 +9,7 @@ const LaunchList = (props) => {
                     return (
                         <div key={launch.id}>
                             <div>Name: {launch.name}</div>
+                            <div>Flight Number: {launch.flight_number}</div>
                         </div>
                     )
                 })}

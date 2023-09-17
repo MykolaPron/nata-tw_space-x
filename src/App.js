@@ -47,8 +47,18 @@ const App = () => {
             return launch.name.toLowerCase().includes(filterNameValue.toLowerCase())
         })
     }
+    const getLaunchesFilteredByFlightNumber = (launches) => {
+        if(filterFlightNumberValue === ""){
+            return launches
+        }
+
+        return launches.filter((launch) => {
+            return launch.flight_number === Number(filterFlightNumberValue)
+        })
+    }
 
     const launchesFilteredByName = getLaunchesFilteredByName(launches)
+    const launchesFilteredByFlightNumber = getLaunchesFilteredByFlightNumber(launchesFilteredByName)
 
     return (
         <div>
@@ -91,7 +101,7 @@ const App = () => {
                     </label>
                 </div>
             </div>
-            <LaunchList launches={launchesFilteredByName}/>
+            <LaunchList launches={launchesFilteredByFlightNumber}/>
             <button onClick={handleAddMore}>Load more (Pages: {totalPages - page})</button>
         </div>
     );
