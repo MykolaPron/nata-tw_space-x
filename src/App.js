@@ -1,10 +1,12 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import LaunchList from "./components/LaunchList";
 import {getLaunchesByPage} from "./services/launchesService";
 import {useDispatch, useSelector} from "react-redux";
 import {addLaunches, setPage, setTotalPages} from "./redux/reducers/launchSlice";
 
 const App = () => {
+    const observerTarget = useRef(null);
+
     const launches = useSelector((state) => state.launch.launches)
     const page = useSelector((state) => state.launch.page)
     const totalPages = useSelector((state) => state.launch.totalPages)
@@ -14,11 +16,13 @@ const App = () => {
     const [filterNameValue, setFilterNameValue] = useState("")
     const [filterFlightNumberValue, setFilterFlightNumberValue] = useState("")
     const [filterDateValue, setFilterDateValue] = useState("")
+    const [canObserv, setCanObserv] = useState(false)
 
     useEffect(() => {
         getLaunchesByPage().then((response) => {
             dispatch(addLaunches(response.data.docs))
             dispatch(setTotalPages(response.data.totalPages))
+            setCanObserv(true)
         })
     }, [])
 
@@ -77,6 +81,33 @@ const App = () => {
     const launchesFilteredByFlightNumber = getLaunchesFilteredByFlightNumber(launchesFilteredByName)
     const launchesFilteredByDate = getLaunchesFilteredDate(launchesFilteredByFlightNumber)
 
+
+    useEffect(() => {
+        if(!canObserv){
+            return
+        }
+
+        const observer = new IntersectionObserver(
+            entries => {
+                if (entries[0].isIntersecting) {
+                    handleAddMore()
+                }
+            },
+            { threshold: 1 }
+        );
+
+        if (observerTarget.current) {
+            observer.observe(observerTarget.current);
+        }
+
+        return () => {
+            if (observerTarget.current) {
+                observer.unobserve(observerTarget.current);
+            }
+        };
+    }, [observerTarget, canObserv, page, totalPages]);
+
+
     return (
         <div>
             <div>
@@ -120,6 +151,7 @@ const App = () => {
             </div>
             <LaunchList launches={launchesFilteredByDate}/>
             <button onClick={handleAddMore}>Load more (Pages: {totalPages - page})</button>
+            <div ref={observerTarget}></div>
         </div>
     );
 };
